@@ -1,0 +1,132 @@
+{% extends 'mainApp/base.html' %}
+{% block content %}
+<section class="search-section"> 
+    <h1>What do you want to work on?</h1>
+    <div class="search-bar">
+        <i class="uil uil-search-alt search-icon"></i>
+        <input type="text" placeholder="Search your board" />
+    </div>
+    <div class="board-categories category-filter">
+        <div class="category-icon">
+            <a href="{% url 'mainApp:home' %}" class="category-btn">
+                <img src="/media/stars.svg" alt="Boards Icon" width="20" height="20">
+            </a>
+            <span>Explore</span>
+        </div>
+        {% for category in categories %}
+        <div class="category-icon">
+            <a href="{% url 'board:filter_boards_by_category' category.id %}" class="category-btn" data-category="{{ category.id }}">
+                <img src="/media/component.svg" alt="Boards Icon" width="20" height="20">
+            </a>
+            <span>{{ category.category_name }}</span>
+        </div>
+        {% endfor %}
+        <div class="category-icon" onclick="openModal()">
+            <button class="category-btn create-new">
+                <img src="/media/create.svg" alt="Create New Icon" width="20" height="20">
+            </button>
+            <span>Create New</span>
+        </div>
+    </div>
+</section>   
+<section class="board-filter">
+    <!-- <select class="filter-item hp1-dropdown">
+        <option value="">Recently accessed boards</option>
+        <option value="">All Boards</option>
+    </select> -->
+    <select id="hp2-dropdown" class="filter-item hp2-dropdown" onchange="handleBoardTypeChange(this)">
+        <option value="all">All Board Types</option>
+        <option value="simple">Simple Boards</option>
+        <option value="project">Project Boards</option>
+    </select>
+</section> 
+<section class="board-list home-boards main-board-list"> 
+    {% for board in boards %}
+        {% if board.visibility == 'public' %}
+        <a href="{% url 'board:board_detail' board.id %}" class="board-preview" style="background-color: {{ board.board_theme }};">
+            <div class="board-header">
+                <h2>{{ board.board_name }}</h2>
+                <img class="ellipsis" src="/media/option.svg" alt="vertical-dots" width="12" height="12">
+                <!-- <div class="ellipsis">...</div> -->
+            </div>
+            <div class="board-content">
+                <p class="creator">Created by {{ board.creator.username }}</p>
+                <p class="updated-time">Last updated {{ board.timestamp }}</p>
+                <div class="board-category">{{ board.category.category_name }}</div>
+                {% if board.board_type == 'project' %}
+                <div class="progress-container" style="border-top: none;">
+                    <div class="progress-bar">
+                    </div>
+                    <span data-width="90%">90%</span>
+                </div>
+                {% else %}
+                <div class="progress-container">
+                    <img src="" alt="">
+                </div>
+                {% endif %}
+            </div>
+        </a>
+        {% endif %}
+    {% endfor %}
+</section>
+
+<section class="board-list home-boards simple-boards-list">
+    {% for board in boards %}
+        {% if board.board_type == 'simple' and board.visibility == 'public' %}
+        <a href="{% url 'board:board_detail' board.id %}" class="board-preview" style="background-color: {{ board.board_theme }};">
+            <div class="board-header">
+                <h2>{{ board.board_name }}</h2>
+                <img class="ellipsis" src="/media/option.svg" alt="vertical-dots" width="12" height="12">
+                <!-- <div class="ellipsis">...</div> -->
+            </div>
+            <div class="board-content">
+                <p class="creator">Created by {{ board.creator.username }}</p>
+                <p class="updated-time">Last updated {{ board.timestamp }}</p>
+                <div class="board-category">{{ board.category.category_name }}</div>
+                {% if board.board_type == 'project' %}
+                <div class="progress-container" style="border-top: none;">
+                    <div class="progress-bar">
+                    </div>
+                    <span data-width="90%">90%</span>
+                </div>
+                {% else %}
+                <div class="progress-container">
+                    <img src="" alt="">
+                </div>
+                {% endif %}
+            </div>
+        </a>
+        {% endif %}
+    {% endfor %}
+</section>
+
+<section class="board-list home-boards project-boards-list">
+    {% for board in boards %}
+        {% if board.board_type == 'project' and board.visibility == 'public' %}
+        <a href="{% url 'board:board_detail' board.id %}" class="board-preview" style="background-color: {{ board.board_theme }};">
+            <div class="board-header">
+                <h2>{{ board.board_name }}</h2>
+                <img class="ellipsis" src="/media/option.svg" alt="vertical-dots" width="12" height="12">
+                <!-- <div class="ellipsis">...</div> -->
+            </div>
+            <div class="board-content">
+                <p class="creator">Created by {{ board.creator.username }}</p>
+                <p class="updated-time">Last updated {{ board.timestamp }}</p>
+                <div class="board-category">{{ board.category.category_name }}</div>
+                {% if board.board_type == 'project' %}
+                <div class="progress-container" style="border-top: none;">
+                    <div class="progress-bar">
+                    </div>
+                    <span data-width="90%">90%</span>
+                </div>
+                {% else %}
+                <div class="progress-container">
+                    <img src="" alt="">
+                </div>
+                {% endif %}
+            </div>
+        </a>
+        {% endif %}
+    {% endfor %}
+</section>
+{% endblock %}

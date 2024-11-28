@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}StickIt Board{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'mainApp/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'mainApp/style.css' %}">
+    <link rel="stylesheet" href="{% static 'mainApp/style1.css' %}">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+</head>
+<body>
+    <header>
+        <div class="logo">STICKIT</div>
+        <div class="header-icons">
+            <button class="create-board-btn" onclick="openModal()">Create Board</button>
+            <div class="user-dropdown">
+                <div id="user-icon" class="m5-user-icon-header-flex" onclick="profileClickDropwdownFunction()">
+                    <div class="user-icon">
+                        <span class="user-initials">{{ initials }}</span>
+                    </div>
+                    <div class="m6-user-name-email-flex">
+                        <span class="username">{{ user.username }}</span>
+                        <span class="email">{{ user.email  }}</span>
+                    </div>
+                    <img class="dropdown-arrow-main-header" src="/media/dropdown-arrow.svg" alt="arrow" width="20" height="20">
+                </div>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <!-- <a href="#" class="dropdown-item" onclick="openProfileModal()">Profile</a> -->
+                    <a href="" class="dropdown-item">Notifications</a>
+                    <a href="" class="dropdown-item">Account Settings</a>
+                    <a href="{% url 'authentication:logout' %}" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="m1-flex-container">
+        <section class="main-navbar" id="">
+            <div class="m2-navbar-flex-container">
+                <div class="m3-page-sect-flex selected home-tab">
+                    <img src="/media/home.svg" alt="home-icon" width="21" height="21">
+                    <a href="{% url 'mainApp:home' %}" class="tab-link">Home</a>
+                    <!-- <span>Home</span> -->
+                </div>
+                <div class="m3-page-sect-flex profile-tab">
+                    <img src="/media/profile.svg" alt="dashboard-icon" width="21" height="21">
+                    <a href="{% url 'mainApp:profile' %}" class="tab-link">Profile</a>
+                    <!-- <span>Profile</span> -->
+                </div>
+                <div class="m3-page-sect-flex boards-tab">
+                    <img src="/media/dashboard.svg" alt="dashboard-icon" width="20" height="20">
+                    <a href="{% url 'mainApp:my_boards' %}" class="tab-link">Boards</a>
+                </div>
+                <div class="m4-myspace-comp-flex">
+                    <span>My Boards</span>
+                    <!-- <span>Shared Boards</span> -->
+                    <span>Collaborated Boards</span>
+                </div>
+            </div>
+            <img class="main-navbar-bg" src="/media/navbar-bg.svg" alt="">
+        </section>
+
+        <section class="main-flex-container">
+            <section class="main-container"> 
+                {% block content %}
+                {% endblock %}
+            </section>
+        </section>
+    </div>
+    
+    <!-- <footer class="my-space-footer">
+        <div class="footer-container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            <div style="margin-bottom: 15px;">
+                <a href="/" style="text-decoration: none; font-weight: bold; font-size: 1.2em; color: #333;">STICKIT</a>
+            </div>
+            
+            <nav style="margin-bottom: 15px;">
+                <a href="/about" style="margin: 0 10px; color: #666; text-decoration: none;">About Us</a>
+                <a href="/contact" style="margin: 0 10px; color: #666; text-decoration: none;">Contact</a>
+                <a href="/privacy" style="margin: 0 10px; color: #666; text-decoration: none;">Privacy Policy</a>
+                <a href="/terms" style="margin: 0 10px; color: #666; text-decoration: none;">Terms of Service</a>
+            </nav>
+            
+            <div style="font-size: 0.9em; color: #888;">
+                © 2024 STICKIT. All rights reserved.
+            </div>
+        </div>
+    </footer> -->
+
+    <!-- Modal Overlay -->
+    <div id="createBoardModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Board</h2>
+                <img class="close-btn" src="/media/close-btn.svg" alt="x-symbol" width="30" height="30" onclick="closeModal()">
+                <!-- <span class="close-btn" style="font-size: 28px;" onclick="closeModal()">&times;</span> -->
+            </div>
+            
+            <form method="POST" action="{% url 'board:create_board' %}"> 
+                {% csrf_token %}
+                <div class="form-group first-input">
+                    <label for="board-namde">Board Name</label>
+                    <input type="text" name="board_name" id="board-name" placeholder="Board Name" required>
+                    <!-- <div class="input">
+                        {{forms.board_name}}
+                    </div> -->
+                </div>
+
+                <div class="form-group">
+                    <label for="board-description">Board Description</label>
+                    <textarea name="description" id="board-description" placeholder="Board Description" required></textarea>
+                    <!-- <div class="textarea"> -->
+                        <!-- {{ forms.board_description }} -->
+                    <!-- </div> -->
+                </div>
+
+                <div class="form-group">
+                    <label for="collaborators">Collaborators</label>
+                    <div class="dropdown-container">
+                        <div class="dropdown" onclick="toggleDropdown()">Add people to send the link to</div>
+                        <div class="dropdown-content" id="dropdown-content">
+                            {% for user in users %}
+                                <div class="dropdown-item" onclick="selectUser('{{ user.email }}')">
+                                    <div class="user-list-icon">{{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}</div>
+                                    <div class="user-list-name-and-email">
+                                        <span>{{ user.username }}</span>
+                                        <span>{{ user.email }}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div id="selected-emails-container"></div>
+                    <!-- <input type="hidden" name="collaborators" id="selected-email"> -->
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select name="category" id="category" onchange="handleCategoryChange()" required>
+                        <option value="" selected>Select...</option>
+                        <option value="create-new">Create new...</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.category_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" id="new-category" name="new-category" placeholder="Enter new category" style="display: none; margin-top: 10px;">
+                    <!-- <input value="{{ category.id }}" id="new-category" placeholder="Enter new category" style="display: none; margin-top: 10px;"> -->
+                </div>
+
+                <div class="form-group flex-container" style="margin-bottom: 0;">
+                    <div class="board-type">
+                        <label>Board Type</label>
+                        <select name="board_type" id="board-type" required>
+                            <option value="" selected>Select...</option>
+                            <option value="simple">Simple Board</option>
+                            <option value="project">Project Board</option>
+                        </select>
+                        <!-- {{ forms.board_type }} -->
+                    </div>
+
+                    <div class="form-group" style="margin: 0;">
+                        <label for="theme">Theme</label>
+                        <select name="board_theme" id="theme" class="theme-select">
+                            <option value="#dddcd7">Default (Gray)</option>
+                            <option value="#e0ecf8">Blue</option>
+                            <option value="#dbeed5">Green</option>
+                            <option value="#fde4e4">Pink</option>
+                            <option value="#f2f4cd">Yellow</option>
+                        </select>
+                        <!-- {{ forms.board_theme }} -->
+                    </div>
+                </div>
+
+                <div class="form-group visibility-create-container">
+                    <div class="visibility">
+                        <label for="visibility">Visibility</label>
+                        <select id="visibility" name="visibility" class="visibility-select">
+                            <option value="public">Public</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="accountSettingsModal" class="modal-overlay as-m-overlay">
+        <div class="modal-content">
+            <div>
+                <strong>Account Settings</strong>
+                <span>Password Change</span>
+            </div>
+            <div><strong>Delete Account</strong></div>
+        </div>
+    </div>
+
+    <script src="{% static 'mainApp/scripts.js' %}"></script>
+</body>
+</html>
