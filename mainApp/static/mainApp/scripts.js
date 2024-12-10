@@ -114,23 +114,16 @@ function closeModal() {
     }, 300);
 }
 
-// 'No Access Permission' Popup
-function openPermissionModal() {
-    document.getElementById('permissionModal').style.display = 'flex'; 
-}
+// open_settings.onclick = function() {}
 
-function closePermissionModal() {
-    document.getElementById('permissionModal').style.display = 'none'; 
-}
-
-open_settings.onclick = function() {
+function openSettingsModal() {
     const overlay = document.querySelector('.as-m-overlay');
     overlay.classList.remove('disappear');
     overlay.classList.add('appear');
     overlay.style.display = 'flex';
 }
 
-close_settings.onclick = function() {
+function closeSettingsModal() {
     const overlay = document.querySelector('.as-m-overlay');
     overlay.classList.remove('appear');
     overlay.classList.add('disappear');
@@ -139,11 +132,20 @@ close_settings.onclick = function() {
     }, 300);
 }
 
-window.onclick = function(event) {
-    const modal = document.getElementById('permissionModal');
-    if (event.target === modal) {
-        closePermissionModal();
-    }
+function openEditProfPicModal() {
+    const ppModal = document.querySelector('.profile-pic-form-mod');
+    ppModal.classList.remove('disappear');
+    ppModal.classList.add('appear');
+    ppModal.style.display = 'block';
+}
+
+function closeEditProfPicModal() {
+    const ppModal = document.querySelector('.profile-pic-form-mod');
+    ppModal.classList.remove('appear');
+    ppModal.classList.add('disappear');
+    setTimeout(() => {
+        ppModal.style.display = 'none';
+    }, 300);
 }
 
 // Create Board Modal Section
@@ -339,3 +341,4 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 300);
     });
 });
+

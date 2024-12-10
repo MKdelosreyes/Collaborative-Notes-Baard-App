@@ -3,13 +3,7 @@ from django.db import models
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, null = True, on_delete=models.CASCADE)
-    # email = models.EmailField(unique=True)
-    # first_name = models.CharField(max_length=30)
-    # last_name = models.CharField(max_length=30)
-    # password1 = models.CharField(max_length=100)
-    # password2 = models.CharField(max_length=100)
-    # birth_date = models.DateField(null=True, blank=True)
-    # phone_number = models.CharField(max_length=15, blank=True, null=True)
+    image = models.ImageField(null=True, blank=True, upload_to='profile_pics')
     birthdate = models.DateField(null=True, blank=True)
     description = models.TextField(max_length=500, null=True, blank =True)
     facebook_link = models.TextField(max_length=250, null=True,blank=True)

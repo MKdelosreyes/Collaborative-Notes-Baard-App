@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
+{% load custom_filters %}
 
 <html lang="en">
 <head>
@@ -9,12 +10,7 @@
     <link rel="stylesheet" href="{% static 'mainApp/styles.css' %}">
     <link rel="stylesheet" href="{% static 'mainApp/style.css' %}">
     <link rel="stylesheet" href="{% static 'mainApp/style1.css' %}">
-    <link rel="stylesheet" href="{% static 'mainApp/css/popUpModal.css' %}">
-    <link rel="stylesheet" href="{% static 'board/css/notifs.css' %}">
-    <link rel="stylesheet" href="{% static 'board/css/joinBoard.css' %}">
-
-
-    <!-- <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" /> -->
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
 </head>
 <body>
     <header>
@@ -23,9 +19,14 @@
             <button class="create-board-btn" onclick="openModal()">Create Board</button>
             <div class="user-dropdown">
                 <div id="user-icon" class="m5-user-icon-header-flex" onclick="profileClickDropwdownFunction()">
+                    {% if user_profile.image %} 
+                    <div class="user-icon" style="background-image: url({{ user_profile.image.url }}); background-size: cover; background-position: center;">
+                    </div>
+                    {% else %} 
                     <div class="user-icon">
                         <span class="user-initials">{{ initials }}</span>
                     </div>
+                    {% endif %}
                     <div class="m6-user-name-email-flex">
                         <span class="username">{{ user.username }}</span>
                         <span class="email">{{ user.email  }}</span>
@@ -34,8 +35,8 @@
                 </div>
                 <div class="dropdown-menu" id="dropdown-menu">
                     <!-- <a href="#" class="dropdown-item" onclick="openProfileModal()">Profile</a> -->
-                    <a class="dropdown-item" onclick = 'toggleNotificationPopup()'>Notifications</a>
-                    <div class="dropdown-item account-settings">Account Settings</div>
+                    <a href="" class="dropdown-item">Notifications</a>
+                    <div class="dropdown-item account-settings" onclick="openSettingsModal()">Account Settings</div>
                     <a href="{% url 'authentication:logout' %}" class="dropdown-item">Logout</a>
                 </div>
             </div>
@@ -94,39 +95,7 @@
             </div>
         </div>
     </footer> -->
-        <!-- Notifications modal -->
-        <div id="notification-popup" class="notification-popup">
-            <span class = "close-notif">&times;</span>
-            <h3>Notifications</h3>
-            <ul id="notification-list">
-                {%if not notifications%}
-                    <li>You have no notifications.</li>
-                {%endif%}
-                {%for notifs in notifications%}
-                    {%if notifs.has_responded == False%}
-                        <li>{{notifs.message}}
-                            {%if notifs.notif_type == 'invite'%}
-                            <form method = "POST" action = "{%url 'board:respond_invite' notifs.id%}">
-                                {%csrf_token%}
-                                <input type="submit" value = "Yes" name = 'accept'>
-                                <input type="submit" value = "No" name = 'decline'>
-                            </form>
-                            {%endif%}
-                            {%if notifs.notif_type == 'join'%}
-                            <form method = "POST" action = "{%url 'board:respond_join' notifs.id%}">
-                                {%csrf_token%}
-                                <input type="submit" value = "Yes" name = 'accept'>
-                                <input type="submit" value = "No" name = 'decline'>
-                            </form>
-                            {%endif%}
-                        </li>
-                        
-                    {%else%}
-                        <!-- <li>You have no notifications.</li> -->
-                    {%endif%}
-                {%endfor%}
-            </ul>
-        </div>
+
     <!-- Modal Overlay -->
     <div id="createBoardModal" class="modal-overlay">
         <div class="modal-content">
@@ -230,7 +199,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1>Account Settings</h1>
-                <img class="close-btn" src="/media/close-btn.svg" alt="x-symbol" width="30" height="30" id="close-settings-btn">
+                <img class="close-btn" src="/media/close-btn.svg" alt="x-symbol" width="30" height="30" id="close-settings-btn" onclick="closeSettingsModal()">
             </div>
             <form action="">
                 <div class="mod-change-pass">
@@ -257,7 +226,16 @@
         </div>
     </div>
 
+    <!-- <div class="profile-pic-form-mod">
+        <form method="POST" enctype="multipart/form-data" >
+            {% csrf_token %}
+            <img class="pp-modal-close" src="/media/x-close.svg" alt="x-symbol" width="16" height="16" onclick="closeEditProfPicModal()">
+            <input type="file" name="image" accept="image/*" />
+            <button class="remove-pp-btn">Remove Profile Pic</button>
+            <button type="submit" class="upload-pp-btn">Upload</button>
+        </form>
+    </div> -->
     <script src="{% static 'mainApp/scripts.js' %}"></script>
-    <script src="{% static 'board/js/notifications.js' %}"></script>
+    <!-- <script src="{% static 'mainApp/scriptsVS2.js' %}"></script> -->
 </body>
 </html>
