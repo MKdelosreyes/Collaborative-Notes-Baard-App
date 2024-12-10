@@ -11,13 +11,15 @@ let main_board_list = document.querySelector('.main-board-list');
 let user_brds_btn = document.querySelector('.user-boards-sect');
 let shared_brds_btn = document.querySelector('.shared-boards-sect');
 let joined_brds_btn = document.querySelector('.joined-boards-sect');
-
-const profileInitialValues = {};
-const socialInitialValues = {};
-const profile_inputs = document.querySelectorAll('.profile-input');
-const social_links_inputs = document.querySelectorAll('.socials-input');
-const updateP1Btn = document.getElementById('p1-update-btn');
-const updateP2Btn = document.getElementById('p2-update-btn');
+let close_settings = document.getElementById('close-settings-btn');
+let open_settings = document.querySelector('.account-settings');
+let brd_options = document.querySelector('.more-options');
+let profileInitialValues = {};
+let socialInitialValues = {};
+let profile_inputs = document.querySelectorAll('.profile-input');
+let social_links_inputs = document.querySelectorAll('.socials-input');
+let updateP1Btn = document.getElementById('p1-update-btn');
+let updateP2Btn = document.getElementById('p2-update-btn');
 
 window.onload = function() {
     const path = window.location.pathname;
@@ -71,9 +73,17 @@ function profileClickDropwdownFunction() {
     dropdownMenu.classList.toggle('show');
 }
 
+brd_options.onclick = function() {
+    const boardDropdown = document.getElementById('board-mod-options');
+    boardDropdown.classList.toggle('show');
+}
+
 window.addEventListener('click', function (event) {
     const userIcon = document.getElementById('user-icon');
     const dropdownMenu = document.getElementById('dropdown-menu');
+
+    const options = document.querySelector('.more-options');
+    const boardDropdown = document.getElementById('board-mod-options');
     
     if (!userIcon.contains(event.target) && !dropdownMenu.contains(event.target)) {
         dropdownMenu.classList.remove('show');
@@ -81,15 +91,27 @@ window.addEventListener('click', function (event) {
         const user_icon_arrow = document.querySelector('.dropdown-arrow-main-header');
         user_icon_arrow.style.transform = 'rotate(0deg)';
     }
+
+    if (!options.contains(event.target) && !boardDropdown.contains(event.target)) {
+        boardDropdown.classList.remove('show');
+    }
 });
 
 // Open Create Board Modal 
 function openModal() {
-    document.getElementById('createBoardModal').style.display = 'flex'; 
+    const overlay = document.getElementById('createBoardModal');
+    overlay.classList.remove('disappear');
+    overlay.classList.add('appear');
+    overlay.style.display = 'flex';
 }
 
 function closeModal() {
-    document.getElementById('createBoardModal').style.display = 'none'; 
+    const overlay = document.getElementById('createBoardModal');
+    overlay.classList.remove('appear');
+    overlay.classList.add('disappear');
+    setTimeout(() => {
+        overlay.style.display = 'none';
+    }, 300);
 }
 
 // 'No Access Permission' Popup
@@ -99,6 +121,22 @@ function openPermissionModal() {
 
 function closePermissionModal() {
     document.getElementById('permissionModal').style.display = 'none'; 
+}
+
+open_settings.onclick = function() {
+    const overlay = document.querySelector('.as-m-overlay');
+    overlay.classList.remove('disappear');
+    overlay.classList.add('appear');
+    overlay.style.display = 'flex';
+}
+
+close_settings.onclick = function() {
+    const overlay = document.querySelector('.as-m-overlay');
+    overlay.classList.remove('appear');
+    overlay.classList.add('disappear');
+    setTimeout(() => {
+        overlay.style.display = 'none';
+    }, 300);
 }
 
 window.onclick = function(event) {
@@ -255,14 +293,49 @@ function clickMainBoardListFilter() {
     project_boards.style.display = 'none';
 }
 
-// user_brds_btn.onclick = function() {
-//     user_brds_btn.classList.add('active');
-//     shared_brds_btn.classList.remove('active');
-//     joined_brds_btn.classList.remove('active');
-// };
+document.addEventListener("DOMContentLoaded", function () {
+    // Get all board previews and modal elements
+    const boardPreviews = document.querySelectorAll(".board-preview");
+    const modal = document.querySelector(".board-modal");
+    const closeModalBtn = document.getElementById("close-board-detail");
 
-// shared_brds_btn.onclick = function() {
-//     user_brds_btn.classList.remove('active');
-//     shared_brds_btn.classList.add('active');
-//     joined_brds_btn.classList.remove('active');
-// };
+    // Modal content elements
+    const modalTitle = modal.querySelector(".board-title");
+    const modalDescription = modal.querySelector(".board-description");
+    const modalCategory = modal.querySelector(".category-button");
+    const modalCreator = modal.querySelector(".creator-name");
+    const viewBoard = modal.querySelector('.view-board-link');
+    // const modalOtherUsers = modal.querySelector(".other-users");
+
+    boardPreviews.forEach(preview => {
+        preview.addEventListener("click", () => {
+            const boardId = preview.dataset.boardId;
+            const boardName = preview.dataset.boardName;
+            const description = preview.dataset.description;
+            const category = preview.dataset.category;
+            const creator = preview.dataset.creator;
+            // const otherUsers = preview.dataset.otherUsers;
+
+            modal.classList.remove("disappear");
+            modal.style.display = "flex";
+
+            modalTitle.textContent = boardName;
+            modalDescription.textContent = description;
+            modalCategory.textContent = category;
+            modalCreator.textContent = `Created by ${creator}`;
+            // modalOtherUsers.textContent = `${otherUsers} other users on board`;
+            viewBoard.href = `/board/board_view/${boardId}/`;
+            
+            modal.classList.add("appear");
+        });
+    });
+
+    // Close modal functionality
+    closeModalBtn.addEventListener("click", () => {
+        modal.classList.remove('appear');
+        modal.classList.add('disappear');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    });
+});

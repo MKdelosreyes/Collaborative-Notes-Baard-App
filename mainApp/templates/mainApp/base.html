@@ -9,7 +9,12 @@
     <link rel="stylesheet" href="{% static 'mainApp/styles.css' %}">
     <link rel="stylesheet" href="{% static 'mainApp/style.css' %}">
     <link rel="stylesheet" href="{% static 'mainApp/style1.css' %}">
-    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+    <link rel="stylesheet" href="{% static 'mainApp/css/popUpModal.css' %}">
+    <link rel="stylesheet" href="{% static 'board/css/notifs.css' %}">
+    <link rel="stylesheet" href="{% static 'board/css/joinBoard.css' %}">
+
+
+    <!-- <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" /> -->
 </head>
 <body>
     <header>
@@ -29,8 +34,8 @@
                 </div>
                 <div class="dropdown-menu" id="dropdown-menu">
                     <!-- <a href="#" class="dropdown-item" onclick="openProfileModal()">Profile</a> -->
-                    <a href="" class="dropdown-item">Notifications</a>
-                    <a href="" class="dropdown-item">Account Settings</a>
+                    <a class="dropdown-item" onclick = 'toggleNotificationPopup()'>Notifications</a>
+                    <div class="dropdown-item account-settings">Account Settings</div>
                     <a href="{% url 'authentication:logout' %}" class="dropdown-item">Logout</a>
                 </div>
             </div>
@@ -89,7 +94,39 @@
             </div>
         </div>
     </footer> -->
-
+        <!-- Notifications modal -->
+        <div id="notification-popup" class="notification-popup">
+            <span class = "close-notif">&times;</span>
+            <h3>Notifications</h3>
+            <ul id="notification-list">
+                {%if not notifications%}
+                    <li>You have no notifications.</li>
+                {%endif%}
+                {%for notifs in notifications%}
+                    {%if notifs.has_responded == False%}
+                        <li>{{notifs.message}}
+                            {%if notifs.notif_type == 'invite'%}
+                            <form method = "POST" action = "{%url 'board:respond_invite' notifs.id%}">
+                                {%csrf_token%}
+                                <input type="submit" value = "Yes" name = 'accept'>
+                                <input type="submit" value = "No" name = 'decline'>
+                            </form>
+                            {%endif%}
+                            {%if notifs.notif_type == 'join'%}
+                            <form method = "POST" action = "{%url 'board:respond_join' notifs.id%}">
+                                {%csrf_token%}
+                                <input type="submit" value = "Yes" name = 'accept'>
+                                <input type="submit" value = "No" name = 'decline'>
+                            </form>
+                            {%endif%}
+                        </li>
+                        
+                    {%else%}
+                        <!-- <li>You have no notifications.</li> -->
+                    {%endif%}
+                {%endfor%}
+            </ul>
+        </div>
     <!-- Modal Overlay -->
     <div id="createBoardModal" class="modal-overlay">
         <div class="modal-content">
@@ -191,14 +228,36 @@
 
     <div id="accountSettingsModal" class="modal-overlay as-m-overlay">
         <div class="modal-content">
-            <div>
-                <strong>Account Settings</strong>
-                <span>Password Change</span>
+            <div class="modal-header">
+                <h1>Account Settings</h1>
+                <img class="close-btn" src="/media/close-btn.svg" alt="x-symbol" width="30" height="30" id="close-settings-btn">
             </div>
-            <div><strong>Delete Account</strong></div>
+            <form action="">
+                <div class="mod-change-pass">
+                    <span><strong>Change Password</strong></span>
+                    <label for="old_password">Old Password</label>
+                    <input type="password" name="old_password" class="profile-input">
+                    <label for="old_password">New Password</label>
+                    <input type="password" name="new_password" class="profile-input">
+                    <label for="old_password">Confirm Password</label>
+                    <input type="password" name="confirm_password" class="profile-input">
+                </div>  
+                <button type="submit" id="p3-update-btn" class="change-pass-btn">Save Password</button>
+            </form>
+            
+            <div class="mod-delete-acc">
+                <span><strong>Delete Account</strong></span>
+                <p>
+                    You will receive an email to confirm your decision.
+                    <br/>
+                    Please note, that all boards you have created will be permanently erased.
+                </p>
+                <a href="">Delete my account</a>
+            </div>
         </div>
     </div>
 
     <script src="{% static 'mainApp/scripts.js' %}"></script>
+    <script src="{% static 'board/js/notifications.js' %}"></script>
 </body>
 </html>

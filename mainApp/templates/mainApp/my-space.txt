@@ -249,3 +249,8 @@ Edit Profile Modal
 // document.getElementById('my-boards-btn').addEventListener('click', () => {
 //     showSection('my-boards-section');
 // });
+
+
+
+
+<a href="{% url 'board:board_detail' board.id %}" class="board-preview" style="background-color: {{ board.board_theme }};">

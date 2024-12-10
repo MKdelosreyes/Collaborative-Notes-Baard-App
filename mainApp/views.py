@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from board.models import Board, ProjectBoard, SimpleBoard, Notification
+from django.contrib.auth import logout
 from board.models import Board, ProjectBoard, SimpleBoard
 from django.contrib.auth import logout, get_user_model
 from django.shortcuts import redirect
@@ -6,20 +8,33 @@ from django.contrib.auth.decorators import login_required
 from .utils import get_user_initials
 from board.models import Category
 from authentication.models import UserProfile
+from .forms import ProfileEditForm
+from django.contrib.auth.models import User
 from .forms import ProfileEditForm, SocialLinksEditForm
 
 
 @login_required(login_url='authentication:login')
 def home(request):
+    
     categories = Category.objects.all()
-    boards = Board.objects.all()
+    boards = Board.objects.all().exclude(creator = request.user).exclude(users = request.user)
     projectboards = ProjectBoard.objects.all()
     simpleboards = SimpleBoard.objects.all()
-    User = get_user_model()
-    users = User.objects.all()
+    # notifs = Notification.objects.all()
+    notifs = Notification.objects.all().filter(user_receiver = request.user)
+    # ej changes
+    users = User.objects.all().exclude(id = request.user.id).exclude(is_staff=True)
+    #
+    # User = get_user_model()
+    # users = User.objects.all()
     # if request.method == 'GET':
     #     board = Board.objects.all()
-    print(request.user.first_name)
+    # if notifs:
+    #     for notif in notifs:
+    #         print(request.user,' == ' , notif.user_receiver)
+    #         print(notif)
+    # else:
+    #     print("empty")
     print(request.user.last_name)
     initials = get_user_initials(request.user)
     context = {
@@ -28,16 +43,16 @@ def home(request):
         'boards': boards,
         'users' : users,
         'projectboards' : projectboards,
-        'simpleboards' : simpleboards
+        'simpleboards' : simpleboards,
+        'users' : users,
+        'notifications':notifs,
     }
-    print(f"This is context {context}")
+    # print(f"This is context {context}")
     return render(request, 'mainApp/home.html', context)
 
 @login_required(login_url='authentication:login')
 def my_space(request):
     initials = get_user_initials(request.user)
-    # boards = Board.objects.all()
-    # categories = Category.objects.all()
     user = request.user
     boards = Board.objects.filter(creator=user)
     categories = Category.objects.filter(board__creator=user).distinct()
@@ -156,7 +171,9 @@ def edit_profile(request):
             return redirect('mainApp:profile')
     else:
         form = ProfileEditForm(instance=profile, user=request.user)
-    return render(request, 'mainApp/profile.html', {'form': form})
+    
+    user_profile = UserProfile.objects.get(user=request.user)
+    return render(request, 'mainApp/profile.html', {'form': form, 'user_profile': user_profile})
 
 
 def edit_social_links(request):

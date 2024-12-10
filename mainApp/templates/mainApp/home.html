@@ -1,5 +1,6 @@
 {% extends 'mainApp/base.html' %}
 {% block content %}
+{%load static%}
 <section class="search-section"> 
     <h1>What do you want to work on?</h1>
     <div class="search-bar">
@@ -30,10 +31,6 @@
     </div>
 </section>   
 <section class="board-filter">
-    <!-- <select class="filter-item hp1-dropdown">
-        <option value="">Recently accessed boards</option>
-        <option value="">All Boards</option>
-    </select> -->
     <select id="hp2-dropdown" class="filter-item hp2-dropdown" onchange="handleBoardTypeChange(this)">
         <option value="all">All Board Types</option>
         <option value="simple">Simple Boards</option>
@@ -43,10 +40,16 @@
 <section class="board-list home-boards main-board-list"> 
     {% for board in boards %}
         {% if board.visibility == 'public' %}
-        <a href="{% url 'board:board_detail' board.id %}" class="board-preview" style="background-color: {{ board.board_theme }};">
+        <div onclick="openJoinModal({{board.id}});" class="board-preview" style="background-color: {{ board.board_theme }};"
+            data-board-id="{{ board.id }}" 
+            data-board-name="{{ board.board_name }}"
+            data-description="{{ board.description }}" 
+            data-category="{{ board.category.category_name }}" 
+            data-creator="{{ board.creator.username }}" 
+            data-board-type="{{ board.board_type }}">
             <div class="board-header">
                 <h2>{{ board.board_name }}</h2>
-                <img class="ellipsis" src="/media/option.svg" alt="vertical-dots" width="12" height="12">
+                <!-- <img class="ellipsis" src="/media/option.svg" alt="vertical-dots" width="12" height="12"> -->
                 <!-- <div class="ellipsis">...</div> -->
             </div>
             <div class="board-content">
@@ -65,7 +68,7 @@
                 </div>
                 {% endif %}
             </div>
-        </a>
+        </div>
         {% endif %}
     {% endfor %}
 </section>
@@ -73,12 +76,19 @@
 <section class="board-list home-boards simple-boards-list">
     {% for board in boards %}
         {% if board.board_type == 'simple' and board.visibility == 'public' %}
-        <a href="{% url 'board:board_detail' board.id %}" class="board-preview" style="background-color: {{ board.board_theme }};">
+        <div class="board-preview" style="background-color: {{ board.board_theme }};"
+            data-board-id="{{ board.id }}" 
+            data-board-name="{{ board.board_name }}"
+            data-description="{{ board.description }}" 
+            data-category="{{ board.category.category_name }}" 
+            data-creator="{{ board.creator.username }}" 
+            data-board-type="{{ board.board_type }}">
             <div class="board-header">
                 <h2>{{ board.board_name }}</h2>
-                <img class="ellipsis" src="/media/option.svg" alt="vertical-dots" width="12" height="12">
+                <!-- <img class="ellipsis" src="/media/option.svg" alt="vertical-dots" width="12" height="12"> -->
                 <!-- <div class="ellipsis">...</div> -->
             </div>
+            
             <div class="board-content">
                 <p class="creator">Created by {{ board.creator.username }}</p>
                 <p class="updated-time">Last updated {{ board.timestamp }}</p>
@@ -95,7 +105,7 @@
                 </div>
                 {% endif %}
             </div>
-        </a>
+        </div>
         {% endif %}
     {% endfor %}
 </section>
@@ -103,11 +113,15 @@
 <section class="board-list home-boards project-boards-list">
     {% for board in boards %}
         {% if board.board_type == 'project' and board.visibility == 'public' %}
-        <a href="{% url 'board:board_detail' board.id %}" class="board-preview" style="background-color: {{ board.board_theme }};">
+        <div class="board-preview" style="background-color: {{ board.board_theme }};"
+            data-board-id="{{ board.id }}" 
+            data-board-name="{{ board.board_name }}"
+            data-description="{{ board.description }}" 
+            data-category="{{ board.category.category_name }}" 
+            data-creator="{{ board.creator.username }}" 
+            data-board-type="{{ board.board_type }}">
             <div class="board-header">
                 <h2>{{ board.board_name }}</h2>
-                <img class="ellipsis" src="/media/option.svg" alt="vertical-dots" width="12" height="12">
-                <!-- <div class="ellipsis">...</div> -->
             </div>
             <div class="board-content">
                 <p class="creator">Created by {{ board.creator.username }}</p>
@@ -125,8 +139,59 @@
                 </div>
                 {% endif %}
             </div>
-        </a>
+        </div>
         {% endif %}
-    {% endfor %}
-</section>
+        {% endfor %}
+    </section>
+
+<div class="modal-overlay board-modal glass">
+    <div class="modal-content board-content-mod">
+        <img id="close-board-detail" src="/media/x-close.svg" alt="x-symbol" width="18" height="18">
+        <div class="board-main-sect-b1">
+            <div class="board-text-desc">
+                <h2 class="board-title">Board Title</h2>
+                <p class="board-description">
+                    <strong>[Board Description]</strong> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean luctus tellus et tempus viverra. Mauris ac consequat erat. Cras et tempor risus.
+                </p>
+                <div class="category-section">
+                    <span class="category-button">Category</span>
+                </div>
+                <div class="creator-info">
+                    <div class="avatar">EN</div>
+                    <p class="creator-name">Created by Elijah Nigel</p>
+                </div>    
+                <p class="other-users">2 other users on board</p>
+                <div class="modal-actions">
+                    <!-- <button class="join-board">Join</button> -->
+                    <a href="" class="view-board-link"><button class="view-board">View Board</button></a>
+                    <button class="more-options"><img src="/media/option.svg" alt="three-dots-horizontal" width="20" height="20"></button>
+                    <div id="board-mod-options" class="board-mod-options">
+                        <div class="dr-options">Share</div>
+                        <div class="dr-options" onclick = 'openJoinRequestModal()'>Request Collaboration</div>
+                        <div class="dr-options">Report Board</div>
+                    </div>
+                </div>
+            </div>
+            <div class="board-preview-n-btns">
+                <div class="board-pvw"></div>
+            </div> 
+       </div>
+    </div> 
+</div>
+  
+    <!-- Trigger/Open The Modal --> 
+    <div id="myPopupModal" class="modal" style = "z-index: 1100;">
+    
+      <div class="modal-content">
+        <!-- <span class="close">&times;</span>  -->
+        <p>Do you like to join this board?</p>
+        <button id = "joinButton" >Yes</button>
+        <button id = "notJoinBtn">No</button>
+      </div>
+    </div>
+
+
+<script src="{% static 'mainApp/js/popUpModal.js' %}"></script>
+<script>
+</script>
 {% endblock %}
